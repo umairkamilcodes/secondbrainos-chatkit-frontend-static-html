@@ -2,8 +2,6 @@
 
 A single-file AI chat interface powered by [Second Brain OS](https://secondbrainos.com) and OpenAI's ChatKit. No build tools, no dependencies — just HTML.
 
-[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/umairkamilcodes/secondbrainos-chatkit-frontend-static-html)
-
 ## Features
 
 - **Zero Build Step** - Pure HTML/CSS/JS, works anywhere
@@ -51,7 +49,7 @@ const DOMAIN_KEY = 'domain_pk_your_key_here';
 
 Upload `index.html` to any static hosting:
 
-- **Cloudflare Pages** - Click the deploy button above, or connect your repo
+- **Cloudflare Pages** - Connect your GitHub repo or drag-and-drop the file
 - **GitHub Pages** - Push to a `gh-pages` branch
 - **Netlify** - Drag and drop the file
 - **Vercel** - Deploy as a static site
