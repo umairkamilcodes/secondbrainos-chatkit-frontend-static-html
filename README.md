@@ -108,12 +108,8 @@ Add this anywhere in your HTML where you want the chat to appear:
 
 ### Option 2: WordPress
 
-1. Install a plugin like **Insert Headers and Footers** or **WPCode**
-2. Add the ChatKit script to your footer:
-   ```html
-   <script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
-   ```
-3. Create a new page or use a Custom HTML block, and paste the container + initialization script
+1. Create a new page or use a **Custom HTML** block
+2. Paste the full code snippet from Option 1
 
 ### Option 3: Squarespace / Wix / Webflow
 
