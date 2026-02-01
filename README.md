@@ -2,7 +2,7 @@
 
 A single-file AI chat interface powered by [Second Brain OS](https://secondbrainos.com) and OpenAI's ChatKit. No build tools, no dependencies — just HTML.
 
-[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/YOUR_USERNAME/chatkit-frontend-static-html)
+[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/umairkamilcodes/secondbrainos-chatkit-frontend-static-html)
 
 ## Features
 
@@ -57,6 +57,86 @@ Upload `index.html` to any static hosting:
 - **Vercel** - Deploy as a static site
 - **S3 + CloudFront** - Upload to a bucket with static hosting enabled
 - **Any web server** - Just serve the HTML file
+
+## Embed in Any Website
+
+You can add the ChatKit widget to any existing website — WordPress, Squarespace, Wix, or any custom HTML page. Just add this code snippet:
+
+### Option 1: Inline Chat Widget
+
+Add this anywhere in your HTML where you want the chat to appear:
+
+```html
+<!-- ChatKit Container -->
+<div id="my-chat" style="width: 100%; max-width: 800px; height: 600px;"></div>
+
+<!-- ChatKit Script -->
+<script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
+<script>
+  const DOMAIN_KEY = 'domain_pk_your_key_here'; // Replace with your domain key
+  const API_URL = 'https://openai.secondbrainos.com/chatkit';
+
+  const customFetch = (url, options = {}) => {
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'X-Domain-Key': DOMAIN_KEY,
+      },
+    });
+  };
+
+  function initChatKit() {
+    const chatkit = document.getElementById('my-chat');
+    if (chatkit && chatkit.setOptions) {
+      chatkit.setOptions({
+        api: {
+          url: API_URL,
+          domainKey: DOMAIN_KEY,
+          fetch: customFetch,
+        },
+        theme: 'light',
+      });
+    } else {
+      setTimeout(initChatKit, 50);
+    }
+  }
+
+  initChatKit();
+</script>
+```
+
+### Option 2: WordPress
+
+1. Install a plugin like **Insert Headers and Footers** or **WPCode**
+2. Add the ChatKit script to your footer:
+   ```html
+   <script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
+   ```
+3. Create a new page or use a Custom HTML block, and paste the container + initialization script
+
+### Option 3: Squarespace / Wix / Webflow
+
+1. Add a **Custom Code** or **Embed** block to your page
+2. Paste the full code snippet from Option 1
+3. Adjust the container dimensions to fit your layout
+
+### Styling the Widget
+
+Customize the container to match your site:
+
+```html
+<style>
+  #my-chat {
+    width: 100%;
+    max-width: 600px;
+    height: 500px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+</style>
+```
 
 ## Security
 
