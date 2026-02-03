@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>n8n Chat Widget Examples</title>
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .section {
+            padding: 20px;
+        }
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        .section-subtitle {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #333, transparent);
+            margin: 40px 20px;
+        }
+
+        /* Window mode container */
+        .window-container {
+            min-height: 700px;
+            position: relative;
+        }
+
+        /* Fullscreen mode container */
+        .fullscreen-container {
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* Showcase */
+        .showcase-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            padding: 20px;
+        }
+        .demo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .demo-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .demo-label strong {
+            color: #999;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Embedded chat containers */
+        .chat-container {
+            border-radius: 12px;
+            overflow: hidden;
+            background: #1a1a1a;
+        }
+        .chat-large {
+            width: 400px;
+            height: 600px;
+        }
+        .chat-medium {
+            width: 350px;
+            height: 500px;
+        }
+        .chat-small {
+            width: 300px;
+            height: 400px;
+        }
+
+        @media (max-width: 900px) {
+            .chat-large,
+            .chat-medium,
+            .chat-small {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Window Mode (Default) -->
+    <section class="section">
+        <div class="section-title">Window Mode (Default)</div>
+        <div class="section-subtitle">mode: 'window' - Toggle button in corner, opens chat popup</div>
+        <div id="chat-window" class="window-container"></div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Fullscreen Mode -->
+    <section class="section">
+        <div class="section-title">Fullscreen Mode (100vw x 100vh)</div>
+        <div class="section-subtitle">mode: 'fullscreen' - Chat fills entire container</div>
+        <div id="chat-fullscreen" class="fullscreen-container"></div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Embedded Sizes -->
+    <section class="section">
+        <div class="section-title">Embedded Sizes</div>
+        <div class="section-subtitle">mode: 'fullscreen' in sized containers</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <div id="chat-large" class="chat-container chat-large"></div>
+                <div class="demo-label"><strong>Large</strong>400 x 600</div>
+            </div>
+            <div class="demo-item">
+                <div id="chat-medium" class="chat-container chat-medium"></div>
+                <div class="demo-label"><strong>Medium</strong>350 x 500</div>
+            </div>
+            <div class="demo-item">
+                <div id="chat-small" class="chat-container chat-small"></div>
+                <div class="demo-label"><strong>Small</strong>300 x 400</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Custom Initial Messages -->
+    <section class="section">
+        <div class="section-title">Custom Initial Messages</div>
+        <div class="section-subtitle">initialMessages: ['...', '...']</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <div id="chat-custom-messages" class="chat-container chat-medium"></div>
+                <div class="demo-label"><strong>Custom Greeting</strong>Multiple welcome messages</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Welcome Screen -->
+    <section class="section">
+        <div class="section-title">Welcome Screen</div>
+        <div class="section-subtitle">showWelcomeScreen: true</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <div id="chat-welcome" class="chat-container chat-medium"></div>
+                <div class="demo-label"><strong>Welcome Screen</strong>Shows intro before chat</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Custom i18n -->
+    <section class="section">
+        <div class="section-title">Custom Text (i18n)</div>
+        <div class="section-subtitle">i18n: { en: { title, subtitle, inputPlaceholder, ... } }</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <div id="chat-custom-i18n" class="chat-container chat-medium"></div>
+                <div class="demo-label"><strong>Custom Labels</strong>title, subtitle, placeholder</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- CSS Customization Reference -->
+    <section class="section">
+        <div class="section-title">CSS Customization</div>
+        <div class="section-subtitle">Override these CSS variables in :root to customize colors</div>
+        <pre style="background: #111; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 12px; color: #888;">
+:root {
+    /* Primary colors */
+    --chat--color--primary: #e74266;
+    --chat--color--primary-shade-50: #db4061;
+    --chat--color--primary--shade-100: #cf3c5c;
+
+    /* Secondary colors */
+    --chat--color--secondary: #20b69e;
+    --chat--color-secondary-shade-50: #1ca08a;
+
+    /* Layout */
+    --chat--window--width: 400px;
+    --chat--window--height: 600px;
+    --chat--spacing: 1rem;
+    --chat--border-radius: 0.25rem;
+
+    /* Header */
+    --chat--header--background: var(--chat--color-dark);
+    --chat--header--color: var(--chat--color-light);
+
+    /* Messages */
+    --chat--message--bot--background: var(--chat--color-white);
+    --chat--message--bot--color: var(--chat--color-dark);
+    --chat--message--user--background: var(--chat--color--secondary);
+    --chat--message--user--color: var(--chat--color-white);
+
+    /* Toggle button */
+    --chat--toggle--background: var(--chat--color--primary);
+    --chat--toggle--size: 64px;
+}
+        </pre>
+    </section>
+
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        const WEBHOOK_URL = 'add n8n chatwidget webhook here';
+
+        // Window mode (default toggle button)
+        createChat({
+            webhookUrl: WEBHOOK_URL,
+            target: '#chat-window',
+            mode: 'window',
+            initialMessages: [
+                'Hi there! 👋',
+                'Click the chat button to start a conversation.',
+            ],
+        });
+
+        // Fullscreen mode
+        createChat({
+            webhookUrl: WEBHOOK_URL,
+            target: '#chat-fullscreen',
+            mode: 'fullscreen',
+            initialMessages: ['Welcome! This is fullscreen mode.'],
+        });
+
+        // Embedded sizes
+        createChat({
+            webhookUrl: WEBHOOK_URL,
+            target: '#chat-large',
+            mode: 'fullscreen',
+            initialMessages: ['Large size widget'],
+        });
+
+        createChat({
+            webhookUrl: WEBHOOK_URL,
+            target: '#chat-medium',
+            mode: 'fullscreen',
+            initialMessages: ['Medium size widget'],
+        });
+
+        createChat({
+            webhookUrl: WEBHOOK_URL,
+            target: '#chat-small',
+            mode: 'fullscreen',
+            initialMessages: ['Small size widget'],
+        });
+
+        // Custom initial messages
+        createChat({
+            webhookUrl: WEBHOOK_URL,
+            target: '#chat-custom-messages',
+            mode: 'fullscreen',
+            initialMessages: [
+                'Hello! 🌟',
+                'Welcome to our support chat.',
+                'How can we help you today?',
+            ],
+        });
+
+        // Welcome screen
+        createChat({
+            webhookUrl: WEBHOOK_URL,
+            target: '#chat-welcome',
+            mode: 'fullscreen',
+            showWelcomeScreen: true,
+            initialMessages: ['Thanks for starting a chat!'],
+            i18n: {
+                en: {
+                    title: 'Welcome! 👋',
+                    subtitle: "We're here to help you 24/7.",
+                    getStarted: 'Start Conversation',
+                },
+            },
+        });
+
+        // Custom i18n
+        createChat({
+            webhookUrl: WEBHOOK_URL,
+            target: '#chat-custom-i18n',
+            mode: 'fullscreen',
+            initialMessages: ['Custom labels example'],
+            i18n: {
+                en: {
+                    title: 'Support Bot',
+                    subtitle: 'We typically reply within minutes',
+                    getStarted: 'Start Chat',
+                    inputPlaceholder: 'Ask me anything...',
+                    footer: 'Powered by n8n',
+                },
+            },
+        });
+    </script>
+</body>
+</html>

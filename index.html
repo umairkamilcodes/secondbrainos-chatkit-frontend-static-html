@@ -24,23 +24,71 @@
             margin-bottom: 20px;
             color: #333;
         }
-        #my-chat {
-            width: 100%;
-            max-width: 800px;
+        .demo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .demo-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .demo-label strong {
+            color: #333;
+            display: block;
+            margin-bottom: 2px;
+        }
+        #chat-large {
+            width: 800px;
             height: 600px;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .nav-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .nav-links a:hover {
+            background: #555;
+        }
+        @media (max-width: 900px) {
+            #chat-large {
+                width: 100%;
+                max-width: 800px;
+            }
         }
     </style>
 </head>
 <body>
     <h1>SecondBrainOS ChatKit Demo</h1>
 
-    <openai-chatkit id="my-chat"></openai-chatkit>
+    <div class="demo-item">
+        <openai-chatkit id="chat-large"></openai-chatkit>
+        <div class="demo-label"><strong>Large</strong>800 x 600</div>
+    </div>
+
+    <div class="nav-links">
+        <a href="chatkit-examples.html" target="_blank">ChatKit Examples</a>
+        <a href="n8n-examples.html" target="_blank">n8n Examples</a>
+    </div>
 
     <script>
-        const DOMAIN_KEY = '//add your public domain key here';
+        const DOMAIN_KEY = 'add your public domain key here';
         const API_URL = 'https://openai.secondbrainos.com/chatkit';
 
         const customFetch = (url, options = {}) => {
@@ -54,7 +102,7 @@
         };
 
         function init() {
-            const chatkit = document.getElementById('my-chat');
+            const chatkit = document.getElementById('chat-large');
             if (chatkit && chatkit.setOptions) {
                 chatkit.setOptions({
                     api: {
@@ -62,7 +110,7 @@
                         domainKey: DOMAIN_KEY,
                         fetch: customFetch,
                     },
-                    theme: 'light',
+                    theme: { colorScheme: 'light' },
                 });
             } else {
                 setTimeout(init, 50);

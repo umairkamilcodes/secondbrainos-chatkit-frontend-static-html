@@ -2,7 +2,9 @@
 
 A single-file AI chat interface powered by [Second Brain OS](https://secondbrainos.com) and OpenAI's ChatKit. No build tools, no dependencies — just HTML.
 
-[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/umairkamilcodes/secondbrainos-chatkit-frontend-static-html)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/umairkamilcodes/secondbrainos-chatkit-frontend-static-html)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/umairkamilcodes/secondbrainos-chatkit-frontend-static-html)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/umairkamilcodes/secondbrainos-chatkit-frontend-static-html)
 
 ## Features
 
@@ -49,12 +51,13 @@ const DOMAIN_KEY = 'domain_pk_your_key_here';
 
 ### Step 5: Deploy
 
-Upload `index.html` to any static hosting:
+Use one of the deploy buttons above, or upload `index.html` to any static hosting:
 
-- **Cloudflare Pages** - Click the deploy button above, or connect your repo
+- **Vercel** - Click the deploy button above (recommended)
+- **Netlify** - Click the deploy button above
+- **Render** - Click the deploy button above
+- **Cloudflare Pages** - Connect your GitHub repo directly in the Cloudflare dashboard
 - **GitHub Pages** - Push to a `gh-pages` branch
-- **Netlify** - Drag and drop the file
-- **Vercel** - Deploy as a static site
 - **S3 + CloudFront** - Upload to a bucket with static hosting enabled
 - **Any web server** - Just serve the HTML file
 
@@ -64,14 +67,20 @@ You can add the ChatKit widget to any existing website — WordPress, Squarespac
 
 ### Option 1: Inline Chat Widget
 
-Add this anywhere in your HTML where you want the chat to appear:
+Add the ChatKit script to your `<head>`:
+
+```html
+<head>
+  <script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
+</head>
+```
+
+Then add this where you want the chat to appear in your `<body>`:
 
 ```html
 <!-- ChatKit Container -->
-<div id="my-chat" style="width: 100%; max-width: 800px; height: 600px;"></div>
+<openai-chatkit id="my-chat" style="width: 100%; max-width: 800px; height: 600px;"></openai-chatkit>
 
-<!-- ChatKit Script -->
-<script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
 <script>
   const DOMAIN_KEY = 'domain_pk_your_key_here'; // Replace with your domain key
   const API_URL = 'https://openai.secondbrainos.com/chatkit';
@@ -95,7 +104,7 @@ Add this anywhere in your HTML where you want the chat to appear:
           domainKey: DOMAIN_KEY,
           fetch: customFetch,
         },
-        theme: 'light',
+        theme: { colorScheme: 'light' },
       });
     } else {
       setTimeout(initChatKit, 50);
@@ -121,17 +130,15 @@ Add this anywhere in your HTML where you want the chat to appear:
 
 Customize the container to match your site:
 
-```html
-<style>
-  #my-chat {
-    width: 100%;
-    max-width: 600px;
-    height: 500px;
-    margin: 0 auto;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  }
-</style>
+```css
+#my-chat {
+  width: 100%;
+  max-width: 600px;
+  height: 500px;
+  margin: 0 auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
 ```
 
 ## Security
@@ -249,6 +256,77 @@ Control the chat widget size via CSS:
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 ```
+
+### Widget Mode (Floating Toggle)
+
+ChatKit doesn't have a native widget mode, but you can create one with a custom wrapper. Add this CSS and HTML for a floating chat button:
+
+```html
+<style>
+  .chat-widget-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #2563eb;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    z-index: 1000;
+  }
+  .chat-widget-toggle svg {
+    width: 28px;
+    height: 28px;
+    fill: white;
+  }
+  .chat-widget-toggle.open .icon-chat { display: none; }
+  .chat-widget-toggle.open .icon-close { display: block; }
+  .chat-widget-toggle .icon-close { display: none; }
+
+  .chat-widget-container {
+    position: fixed;
+    bottom: 100px;
+    right: 24px;
+    width: 400px;
+    height: 600px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.95);
+    transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+    z-index: 999;
+  }
+  .chat-widget-container.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+</style>
+
+<button class="chat-widget-toggle" id="widget-toggle">
+  <svg class="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+  <svg class="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+</button>
+
+<div class="chat-widget-container" id="widget-container">
+  <openai-chatkit id="widget-chat" style="width:100%;height:100%;"></openai-chatkit>
+</div>
+
+<script>
+  const toggle = document.getElementById('widget-toggle');
+  const container = document.getElementById('widget-container');
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('open');
+    container.classList.toggle('open');
+  });
+</script>
+```
+
+See `chatkit-widget-mode.html` for a complete working example.
 
 ## Troubleshooting
 

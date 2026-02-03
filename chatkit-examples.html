@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatKit Widget Showcase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .section {
+            padding: 20px;
+        }
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        .section-subtitle {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #333, transparent);
+            margin: 40px 20px;
+        }
+
+        /* Full Viewport */
+        #chat-full {
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* Size Showcase */
+        .showcase-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            padding: 20px;
+        }
+        .demo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .demo-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .demo-label strong {
+            color: #999;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Large */
+        #chat-large {
+            width: 800px;
+            height: 600px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Medium */
+        #chat-medium {
+            width: 400px;
+            height: 500px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Small */
+        #chat-small {
+            width: 320px;
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Compact */
+        #chat-compact {
+            width: 280px;
+            height: 350px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Theme demos - consistent size */
+        .theme-demo {
+            width: 380px;
+            height: 480px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        @media (max-width: 900px) {
+            #chat-large {
+                width: 100%;
+                max-width: 800px;
+            }
+            .theme-demo {
+                width: 100%;
+                max-width: 380px;
+            }
+        }
+
+        /* Widget Mode Styles */
+        .widget-demo-area {
+            padding: 40px;
+            text-align: center;
+        }
+        .chat-widget-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #2563eb;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background 0.2s;
+            z-index: 1000;
+        }
+        .chat-widget-toggle:hover {
+            transform: scale(1.05);
+            background: #1d4ed8;
+        }
+        .chat-widget-toggle svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+        .chat-widget-toggle.open .icon-chat {
+            display: none;
+        }
+        .chat-widget-toggle.open .icon-close {
+            display: block;
+        }
+        .chat-widget-toggle .icon-close {
+            display: none;
+        }
+        .chat-widget-container {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 400px;
+            height: 600px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+            z-index: 999;
+        }
+        .chat-widget-container.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        #widget-chat {
+            width: 100%;
+            height: 100%;
+        }
+        @media (max-width: 500px) {
+            .chat-widget-container {
+                width: calc(100% - 48px);
+                height: calc(100% - 140px);
+                bottom: 100px;
+                right: 24px;
+                left: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Widget Mode -->
+    <section class="section">
+        <div class="section-title">Widget Mode (Floating Toggle)</div>
+        <div class="section-subtitle">Custom implementation with toggle button - click the button in the corner</div>
+        <div class="widget-demo-area">
+            <p style="color: #666; font-size: 14px;">Click the chat button in the bottom-right corner to open the widget.</p>
+        </div>
+    </section>
+
+    <!-- Widget Toggle Button -->
+    <button class="chat-widget-toggle" id="widget-toggle" aria-label="Toggle chat">
+        <svg class="icon-chat" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+        </svg>
+        <svg class="icon-close" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+    </button>
+
+    <!-- Widget Chat Container -->
+    <div class="chat-widget-container" id="widget-container">
+        <openai-chatkit id="widget-chat"></openai-chatkit>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Full Viewport Version -->
+    <section class="section">
+        <div class="section-title">Full Viewport (100vw x 100vh)</div>
+        <openai-chatkit id="chat-full"></openai-chatkit>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Different Sizes -->
+    <section class="section">
+        <div class="section-title">Different Sizes</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <openai-chatkit id="chat-large"></openai-chatkit>
+                <div class="demo-label"><strong>Large</strong>800 x 600</div>
+            </div>
+        </div>
+
+        <div class="showcase-container">
+            <div class="demo-item">
+                <openai-chatkit id="chat-medium"></openai-chatkit>
+                <div class="demo-label"><strong>Medium</strong>400 x 500</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="chat-small"></openai-chatkit>
+                <div class="demo-label"><strong>Small</strong>320 x 400</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="chat-compact"></openai-chatkit>
+                <div class="demo-label"><strong>Compact</strong>280 x 350</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Color Schemes -->
+    <section class="section">
+        <div class="section-title">Color Schemes</div>
+        <div class="section-subtitle">colorScheme: 'light' | 'dark'</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <openai-chatkit id="theme-light" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Light</strong>colorScheme: 'light'</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="theme-dark" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Dark</strong>colorScheme: 'dark'</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Accent Colors -->
+    <section class="section">
+        <div class="section-title">Accent Colors</div>
+        <div class="section-subtitle">color.accent.primary: '#hexcolor'</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <openai-chatkit id="accent-blue" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Blue</strong>#2563eb</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="accent-purple" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Purple</strong>#7c3aed</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="accent-green" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Green</strong>#059669</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="accent-orange" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Orange</strong>#ea580c</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Border Radius -->
+    <section class="section">
+        <div class="section-title">Border Radius</div>
+        <div class="section-subtitle">radius: 'round' | 'sharp'</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <openai-chatkit id="radius-round" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Round</strong>radius: 'round'</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="radius-sharp" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Sharp</strong>radius: 'sharp'</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Density -->
+    <section class="section">
+        <div class="section-title">Density</div>
+        <div class="section-subtitle">density: 'spacious' | 'compact'</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <openai-chatkit id="density-spacious" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Spacious</strong>density: 'spacious'</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="density-compact" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Compact</strong>density: 'compact'</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Typography -->
+    <section class="section">
+        <div class="section-title">Typography</div>
+        <div class="section-subtitle">typography.fontFamily: 'font-stack'</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <openai-chatkit id="font-inter" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Inter</strong>'Inter', sans-serif</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="font-mono" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Monospace</strong>'JetBrains Mono', monospace</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="font-system" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>System</strong>system-ui, sans-serif</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Color Intensity -->
+    <section class="section">
+        <div class="section-title">Color Intensity</div>
+        <div class="section-subtitle">color.accent.level: 1 | 2 | 3</div>
+        <div class="showcase-container">
+            <div class="demo-item">
+                <openai-chatkit id="level-1" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Level 1</strong>Subtle</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="level-2" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Level 2</strong>Default</div>
+            </div>
+
+            <div class="demo-item">
+                <openai-chatkit id="level-3" class="theme-demo"></openai-chatkit>
+                <div class="demo-label"><strong>Level 3</strong>Bold</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const DOMAIN_KEY = 'add public domain key here';
+        const API_URL = 'https://openai.secondbrainos.com/chatkit';
+
+        const customFetch = (url, options = {}) => {
+            return fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'X-Domain-Key': DOMAIN_KEY,
+                },
+            });
+        };
+
+        const baseApi = {
+            url: API_URL,
+            domainKey: DOMAIN_KEY,
+            fetch: customFetch,
+        };
+
+        // Chat configurations
+        const chatConfigs = {
+            // Widget mode
+            'widget-chat': {
+                theme: { colorScheme: 'light' },
+                startScreen: { greeting: 'Hi! How can I help you today?' },
+            },
+            // Size demos (dark theme)
+            'chat-full': { theme: { colorScheme: 'dark' } },
+            'chat-large': { theme: { colorScheme: 'dark' } },
+            'chat-medium': { theme: { colorScheme: 'dark' } },
+            'chat-small': { theme: { colorScheme: 'dark' } },
+            'chat-compact': { theme: { colorScheme: 'dark' } },
+
+            // Color schemes
+            'theme-light': { theme: { colorScheme: 'light' } },
+            'theme-dark': { theme: { colorScheme: 'dark' } },
+
+            // Accent colors
+            'accent-blue': {
+                theme: {
+                    colorScheme: 'dark',
+                    color: { accent: { primary: '#2563eb', level: 2 } },
+                },
+            },
+            'accent-purple': {
+                theme: {
+                    colorScheme: 'dark',
+                    color: { accent: { primary: '#7c3aed', level: 2 } },
+                },
+            },
+            'accent-green': {
+                theme: {
+                    colorScheme: 'dark',
+                    color: { accent: { primary: '#059669', level: 2 } },
+                },
+            },
+            'accent-orange': {
+                theme: {
+                    colorScheme: 'dark',
+                    color: { accent: { primary: '#ea580c', level: 2 } },
+                },
+            },
+
+            // Border radius
+            'radius-round': {
+                theme: { colorScheme: 'dark', radius: 'round' },
+            },
+            'radius-sharp': {
+                theme: { colorScheme: 'dark', radius: 'sharp' },
+            },
+
+            // Density
+            'density-spacious': {
+                theme: { colorScheme: 'dark', density: 'spacious' },
+            },
+            'density-compact': {
+                theme: { colorScheme: 'dark', density: 'compact' },
+            },
+
+            // Typography
+            'font-inter': {
+                theme: {
+                    colorScheme: 'dark',
+                    typography: { fontFamily: "'Inter', sans-serif" },
+                },
+            },
+            'font-mono': {
+                theme: {
+                    colorScheme: 'dark',
+                    typography: { fontFamily: "'JetBrains Mono', monospace" },
+                },
+            },
+            'font-system': {
+                theme: {
+                    colorScheme: 'dark',
+                    typography: { fontFamily: 'system-ui, sans-serif' },
+                },
+            },
+
+            // Color intensity levels
+            'level-1': {
+                theme: {
+                    colorScheme: 'dark',
+                    color: { accent: { primary: '#2563eb', level: 1 } },
+                },
+            },
+            'level-2': {
+                theme: {
+                    colorScheme: 'dark',
+                    color: { accent: { primary: '#2563eb', level: 2 } },
+                },
+            },
+            'level-3': {
+                theme: {
+                    colorScheme: 'dark',
+                    color: { accent: { primary: '#2563eb', level: 3 } },
+                },
+            },
+        };
+
+        const chatIds = Object.keys(chatConfigs);
+
+        function initChat(id) {
+            const chatkit = document.getElementById(id);
+            if (chatkit && chatkit.setOptions) {
+                chatkit.setOptions({
+                    api: baseApi,
+                    ...chatConfigs[id],
+                });
+                return true;
+            }
+            return false;
+        }
+
+        function initAll() {
+            const pending = chatIds.filter(id => !initChat(id));
+            if (pending.length > 0) {
+                setTimeout(initAll, 50);
+            }
+        }
+
+        initAll();
+
+        // Widget toggle functionality
+        const toggle = document.getElementById('widget-toggle');
+        const container = document.getElementById('widget-container');
+
+        toggle.addEventListener('click', () => {
+            toggle.classList.toggle('open');
+            container.classList.toggle('open');
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && container.classList.contains('open')) {
+                toggle.classList.remove('open');
+                container.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
