@@ -147,6 +147,58 @@ Customize the container to match your site:
 - **Origin validation** - Backend checks the `Origin` header matches the registered domain
 - **Rate limiting** - Applied at the backend level per user
 
+## Custom Agent Names
+
+You can customize the AI assistant's identity by passing an `agent_name` query parameter:
+
+```
+https://your-site.com/?agent_name=my_custom_agent
+```
+
+The agent name is interpolated into the system prompt template, so the AI will identify as whatever name you provide.
+
+### How it works
+
+1. The `agent_name` query parameter is read from the URL
+2. The system prompt template uses `{agent_name}` as a placeholder
+3. The placeholder is replaced with the actual agent name
+4. The prompt is Base64 encoded and sent as `x-system-prompt` header to the backend
+5. The backend uses this as the system prompt (overriding the default `auto_responder_instructions` from Second Brain OS)
+
+### Customizing the prompt template
+
+Edit the `PROMPT_TEMPLATE` constant in your HTML:
+
+```javascript
+const PROMPT_TEMPLATE = `You are {agent_name}, a helpful AI assistant.
+
+Your role is to help users with their questions and tasks.
+Be professional, accurate, and helpful.
+
+Always provide clear explanations and ask clarifying questions when needed.`;
+```
+
+### Multiple named prompts
+
+For more complex use cases, you can define multiple prompts:
+
+```javascript
+const PROMPTS = {
+  assistant: `You are {agent_name}, a helpful AI assistant...`,
+  'sales-agent': `You are {agent_name}, a sales specialist...`,
+  'support-agent': `You are {agent_name}, a customer support expert...`,
+};
+
+function getSystemPrompt(agentName) {
+  const template = PROMPTS[agentName] || PROMPTS['assistant'];
+  return template.replace(/\{agent_name\}/g, agentName);
+}
+```
+
+Then access via URL: `?agent_name=sales-agent`
+
+---
+
 ## Theming & Customization
 
 All theming is done via the `setOptions()` call in your code. Here's a complete example with all available options:

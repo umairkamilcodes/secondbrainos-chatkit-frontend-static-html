@@ -88,8 +88,39 @@
     </div>
 
     <script>
-        const DOMAIN_KEY = 'add your public domain key here';
+        const DOMAIN_KEY = 'add public domain key here';
         const API_URL = 'https://openai.secondbrainos.com/chatkit';
+
+        // Default agent name (used when no ?agent_name= query param is provided)
+        const DEFAULT_AGENT_NAME = 'assistant';
+
+        // System prompt template - use {agent_name} as placeholder
+        const PROMPT_TEMPLATE = `You are {agent_name}, a helpful AI assistant.
+
+Your role is to help users with their questions and tasks.
+Be professional, accurate, and helpful.
+
+Always provide clear explanations and ask clarifying questions when needed.`;
+
+        // Get agent_name from URL query params (e.g., ?agent_name=my_bot)
+        function getAgentName() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('agent_name') || DEFAULT_AGENT_NAME;
+        }
+
+        // Build system prompt with agent name interpolated
+        function getSystemPrompt(agentName) {
+            return PROMPT_TEMPLATE.replace(/\{agent_name\}/g, agentName);
+        }
+
+        // Base64 encode for HTTP header (handles newlines)
+        function encodePrompt(prompt) {
+            return btoa(unescape(encodeURIComponent(prompt)));
+        }
+
+        const agentName = getAgentName();
+        const systemPrompt = getSystemPrompt(agentName);
+        const encodedPrompt = encodePrompt(systemPrompt);
 
         const customFetch = (url, options = {}) => {
             return fetch(url, {
@@ -97,6 +128,7 @@
                 headers: {
                     ...options.headers,
                     'X-Domain-Key': DOMAIN_KEY,
+                    'x-system-prompt': encodedPrompt,
                 },
             });
         };
